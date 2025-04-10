@@ -1,0 +1,50 @@
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+media/
+staticfiles/
+
+# Виртуальное окружение
+venv/
+ENV/
+env/
+.venv/
+
+# IDE и редакторы
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Переменные окружения
+.env
+.env.local
+.env.*.local
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+build/
+.docker/
+
+# Локальные настройки
+local_settings.py
+
+# Тестовые файлы
+tests/output/
+.coverage
+htmlcov/
+.tox/
+
+# Операционная система
+.DS_Store
+Thumbs.db
+
+# Другие временные файлы
+*.tmp
+*.bak
+*.swp

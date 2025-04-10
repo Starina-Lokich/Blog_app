@@ -1,0 +1,76 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<h1>{{ post.title }}</h1>
+<p class="text-muted">
+    Автор: {{ post.author }} | Дата: {{ post.created_at|date:"d.m.Y H:i" }}
+</p>
+<div class="mb-4">
+    <p>{{ post.content }}</p>
+</div>
+
+<h3>Комментарии</h3>
+<div id="comments">
+    {% for comment in post.comment_set.all %}
+    <div class="card mb-3" id="comment-{{ comment.id }}">
+        <div class="card-body">
+            <p class="card-text">{{ comment.text }}</p>
+            <p class="text-muted">Дата: {{ comment.created_at|date:"d.m.Y H:i" }}</p>
+        </div>
+    </div>
+    {% empty %}
+    <p>Комментариев пока нет.</p>
+    {% endfor %}
+</div>
+
+<h4>Добавить комментарий</h4>
+<form id="comment-form" method="post" action="{% url 'add_comment' post.id %}">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="text" class="form-label">Текст комментария</label>
+        <textarea class="form-control" id="text" name="text" rows="3" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Отправить</button>
+</form>
+
+<!-- JavaScript для AJAX -->
+<script>
+document.getElementById('comment-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Отменяем стандартное поведение формы
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken') // CSRF-токен
+        }
+    })
+    .then(response => response.json()) // Парсим JSON-ответ
+    .then(data => {
+        if (data.error) {
+            alert('Ошибка: ' + data.error); // Показываем ошибку, если есть
+        } else {
+            // Добавляем новый комментарий на страницу
+            const commentsDiv = document.getElementById('comments');
+            const newComment = `
+                <div class="card mb-3" id="comment-${data.id}">
+                    <div class="card-body">
+                        <p class="card-text">${data.text}</p>
+                        <p class="text-muted">Дата: ${data.created_at}</p>
+                    </div>
+                </div>
+            `;
+            commentsDiv.innerHTML += newComment; // Добавляем HTML нового комментария
+            form.reset(); // Очищаем форму
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при отправке комментария.');
+    });
+});
+</script>
+{% endblock %}
